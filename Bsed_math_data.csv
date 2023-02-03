@@ -1,0 +1,14 @@
+---
+title: "bsed-3c"
+author: "Nestor Rabuya"
+date: "2023-02-03"
+output: html_document
+---
+```{r}
+library(readr)
+BSED_3C_DATA <- read_csv("BSED_3C_DATA.csv")
+View(BSED_3C_DATA)
+
+```
+
+
