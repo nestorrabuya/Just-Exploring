@@ -1,0 +1,298 @@
+---
+title: "Descriptive Statistics"
+author: "Nestor Rabuya"
+date: "2023-02-03"
+output: html_document
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# IMPORT DATA INTO R
+
+```{r}
+my_data <- read.csv(file.choose())
+```
+
+# CHECK THE DATA
+
+```{r}
+# Print the first 6 rows 
+head(my_data, 6)
+```
+
+# MEASURE OF CENTRAL TENDENCY: MEAN, MEDIAN, MODE
+
+## Mean
+
+```{r}
+# Compute the mean value 
+mean(my_data$Birthday)
+```
+
+## Median
+
+```{r}
+# Compute the median value 
+median(my_data$Birthday)
+```
+
+## Mode
+
+```{r}
+# Compute the mode 
+# install.packages("modeest") 
+require(modeest) 
+mfv(my_data$Birthday)
+```
+
+# MEASURE OF VARIABILITY
+
+## Range: Minimum & Maximum
+
+```{r}
+# Compute the minimum value min
+(my_data$Birthday)
+```
+
+```{r}
+# Compute the maximum value 
+max(my_data$Birthday)
+```
+
+```{r}
+# Range 
+range(my_data$Birthday)
+```
+
+## Interquartile Range
+
+```{r}
+# To compute deciles (0.1, 0.2, 0.3, …., 0.9) 
+quantile(my_data$Birthday, seq(0, 1, 0.1))
+```
+
+```{r}
+# To compute the interquartile range 
+IQR(my_data$Birthday)
+```
+
+## Variance and Standard Deviation
+
+```{r}
+# Compute the variance 
+var(my_data$Birthday)
+```
+
+```{r}
+# Compute the standard deviation = 
+# square root of th variance 
+sd(my_data$Birthday)
+```
+
+## Median Absolute Deviation
+
+```{r}
+# Compute the median absolute deviation 
+mad(my_data$Birthday)
+```
+
+# COMPUTING AN OVERALL SUMMARY OF A VARIABLE AND AN ENTIRE DATA FRAME
+
+## Summary() Function
+
+```{r}
+# Summary of a single variable 
+summary(my_data$Birthday)
+```
+
+```{r}
+# Summary of a data frame 
+summary(my_data, digits = 1)
+```
+
+## Sapply() Function
+
+```{r}
+# Compute the mean of each column 
+sapply(my_data[, -1], mean)
+```
+
+```{r}
+# Compute quartiles 
+sapply(my_data[, -1], quantile)
+```
+
+## Stat.desc() Function
+
+```{r}
+# install.packages("pastecs") 
+# Compute descriptive statistics 
+library(pastecs) 
+res <- stat.desc(my_data[, -1]) 
+round(res, 2)
+```
+
+# GRAPHICAL DISPLAY OF DISTRIBUTION
+
+## Installation and loading of ggpubr
+
+```{r}
+# install.packages("ggpubr") 
+# library(ggpubr)
+```
+
+## Box Plots
+
+```{r}
+ggboxplot(my_data, y = "Birthday", width = 0.5)
+```
+
+## Histogram
+
+```{r}
+gghistogram(my_data, x = "Birthday", bins = 9, add = "mean")
+```
+
+## Empirical Cumulative Distribution Function (ECDF)
+
+```{r}
+ggecdf(my_data, x = "Birthday")
+```
+
+## Q-Q Plots
+
+```{r}
+ggqqplot(my_data, x = "Birthday")
+```
+
+# FREQUENCY TABLES
+
+## Create Some Data
+
+```{r}
+# Hair/eye color data 
+df <- as.data.frame(HairEyeColor) 
+hair_eye_col <- df[rep(row.names(df), df$Freq), 1:3] 
+rownames(hair_eye_col) <- 1:nrow(hair_eye_col) 
+head(hair_eye_col)
+```
+
+```{r}
+# hair/eye variables
+Hair <- hair_eye_col$Hair
+Eye <- hair_eye_col$Eye
+```
+
+## Simple Frequency Distribution: One Categorical Variable
+
+### Table Counts
+
+```{r}
+# Frequency distribution of hair color 
+table(Hair)
+```
+
+```{r}
+# Frequency distribution of eye color 
+table(Eye)
+```
+
+### Graphics
+
+```{r}
+# Compute table and convert as data frame 
+df <- as.data.frame(table(Hair)) 
+df
+```
+
+```{r}
+# Visualize using bar plot 
+library(ggpubr) 
+ggbarplot(df, x = "Hair", y = "Freq")
+```
+
+## Two-way COntingency Table: Two Categorical Variables
+
+```{r}
+tbl2 <- table(Hair , Eye) 
+tbl2
+```
+
+### Graphics
+
+```{r}
+df <- as.data.frame(tbl2) 
+head(df)
+```
+
+```{r}
+# Visualize using bar plot
+library(ggpubr)
+ggbarplot(df, x = "Hair", y = "Freq",
+          color = "Eye", 
+          palette = c("brown", "blue", "gold", "green"))
+```
+
+```{r}
+# position dodge
+ggbarplot(df, x = "Hair", y = "Freq",
+          color = "Eye", position = position_dodge(),
+          palette = c("brown", "blue", "gold", "green"))
+```
+
+## Multiway Tables: More Than Two Categorical Variables
+
+```{r}
+xtabs(~Hair + Eye + Sex, data = hair_eye_col)
+```
+
+```{r}
+ftable(Sex + Hair ~ Eye, data = hair_eye_col)
+```
+
+# COMPUTE TABLE MARGINS AND RELATIVE FREQUENCY
+
+## Format of the Functions
+
+```{r}
+margin.table(x, margin = NULL) 
+prop.table(x, margin = NULL)
+```
+
+## Compute the Table Margins
+
+```{r}
+Hair <- hair_eye_col$Hair 
+Eye <- hair_eye_col$Eye 
+# Hair/Eye color table 
+he.tbl <- table(Hair, Eye) 
+he.tbl
+```
+
+```{r}
+# Margin of rows 
+margin.table(he.tbl, 1)
+```
+
+```{r}
+# Margin of columns 
+margin.table(he.tbl, 2)
+```
+
+## Compute Relative Frequencies
+
+```{r}
+# Frequencies relative to row total 
+prop.table(he.tbl, 1)
+```
+
+```{r}
+# Table of percentages 
+round(prop.table(he.tbl, 1), 2)*100
+```
+
+```{r}
+he.tbl/sum(he.tbl)
+```
